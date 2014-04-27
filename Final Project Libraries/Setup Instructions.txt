@@ -1,0 +1,13 @@
+Download Processing to get pulse sensor to output visuals.  http://processing.org/
+
+
+You may have to change the P_PulseSensor_06 file's serial ports to get it to pull data from Arduino.
+	You can find info on the serial ports by reading the printout when the file is run.
+
+A_PulseSensor_06 is the Arduino sketch.  I did not modify this code.  Does not need to be imported.
+
+RF24 Library should be imported to Arduino to allow modules to communicate with one another.  I used the "Getting Started" example to make them communicate.  No modifications nessecary.  You set tranceiver roles through using "R" or "T" flags in the serial monitor.
+
+Used "Basic Echo Test" from https://learn.adafruit.com/flora-wearable-gps/program-flora to test the GPS unit.
+
+If things don't look like they are working correctly, check the baud rate.  They are different for each component.
