@@ -172,14 +172,15 @@ void loop(void)
     {
       // Dump the payloads until we've gotten everything
       unsigned long got_time;
+      char gotchar[8];
       bool done = false;
       while (!done)
       {
         // Fetch the payload, and see if this was the last one.
-        done = radio.read( &got_time, sizeof(unsigned long) );
+        done = radio.read( &gotchar, sizeof(gotchar) );
 
         // Spew it
-        printf("Got payload %lu...",got_time);
+        printf("Got payload %s...",gotchar);
 
 	// Delay just a little bit to let the other unit
 	// make the transition to receiver
@@ -188,11 +189,13 @@ void loop(void)
 
       // First, stop listening so we can talk
       radio.stopListening();
-
+      char sendchar[8] = "sending";
       // Send the final one back.
-      radio.write( &got_time, sizeof(unsigned long) );
-      printf("Sent response.\n\r");
-
+      bool ok = radio.write( &sendchar, sizeof(sendchar) );
+      if(ok){
+        printf("Sent response.\n\r");
+      }
+      else printf("Couldn't send response\n\r");
       // Now, resume listening so we catch the next packets.
       radio.startListening();
     }

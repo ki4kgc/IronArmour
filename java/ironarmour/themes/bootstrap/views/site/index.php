@@ -8,9 +8,9 @@ $this->pageTitle = Yii::app()->name;
 $m = new MongoClient();
 $db = $m->gpsData;
 
-$gps = $db->gpsCollection;
+$gps = $db->gpsDataCollection;
 
-$gps = $db->gpsCollection;
+/*      
 $gps->remove();
 $coords = array(
         'coordinates'     => array("4043.5717N","07400.2783W"),
@@ -26,18 +26,19 @@ $coords = array(
         'coordinates'     => array("4043.6717N","07400.2783W"),
     );
 $gps->insert($coords);
-
+*/
 $cursor = $gps->find();
+
+$one = $gps->findOne();
+var_dump($one);
 $points = '';
 foreach ($cursor as $doc) {
-    $points.="|". DMStoDEC($doc['coordinates']['0'],'lattitude') . "," . DMStoDEC(($doc['coordinates']['1']),'longitude');
+    //$points.="|". DMStoDEC($doc['coordinates']['0'],'lattitude') . "," . DMStoDEC(($doc['coordinates']['1']),'longitude');
     
 }
 //var_dump($cursor);
 
 //http://maps.google.com/maps/api/staticmap?zoom=14&size=512x512&maptype=roadmap&path=color:0x0000ff|weight:5|40.737102,-73.990318|40.749825,-73.987963|40.752946,-73.987384|40.755823,-73.986397&&sensor=false
-
-$ch = curl_init();
 
 $url = "http://maps.google.com/maps/api/staticmap".
     "?zoom=15".

@@ -22,7 +22,6 @@ public class Serial implements SerialPortEventListener {
     final int PROGRESSBAR_LENGTH = 20;
     SerialPort serialPort;
     String connectedportname;
-    Function F = new Function("Humidity Data");
     Function tester = new Function("TEST");
     double count = 0;
 
@@ -92,7 +91,6 @@ public class Serial implements SerialPortEventListener {
             // get a collection object to work with
             gpsDataCollection = db.getCollection("gpsDataCollection");
             // drop all the data in it
-            gpsDataCollection.drop();
         } catch (UnknownHostException e) {
 
         }
@@ -163,9 +161,11 @@ public class Serial implements SerialPortEventListener {
             try {
                 String inputLine = input.readLine();
 
-                double input_val =  Double.parseDouble(inputLine);
+                //double input_val =  Double.parseDole(inputLine);
                 System.out.println(inputLine);
-                gpsDataCollection.insert(new BasicDBObject().append("count", inputLine));
+                if(count%2==0)
+                gpsDataCollection.insert(new BasicDBObject().append("Coordinates", inputLine));
+                else gpsDataCollection.insert(new BasicDBObject().append("BPM", inputLine));
                 count ++;
 
             } catch (Exception e) {
