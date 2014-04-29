@@ -1,1 +1,1 @@
-C:\mongodb\bin\mongod.exe
+C:\mongo\bin\mongod.exe
