@@ -8,6 +8,7 @@ import gnu.io.SerialPortEventListener;
 import java.util.Enumeration;
 
 import com.mongodb.BasicDBObject;
+import com.mongodb.BasicDBList;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
@@ -18,14 +19,27 @@ import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Set;
 
+import java.util.Date;
+
 public class Serial implements SerialPortEventListener {
     final int PROGRESSBAR_LENGTH = 20;
     SerialPort serialPort;
     String connectedportname;
     Function tester = new Function("TEST");
-    double count = 0;
+    int count = 0;
 
     DBCollection gpsDataCollection;
+
+    BasicDBList gpsDataList = new BasicDBList();
+
+    BasicDBList bpmDataList = new BasicDBList();
+
+    BasicDBObject data = new BasicDBObject();
+    BasicDBObject userData = new BasicDBObject();
+
+    Date d = new Date();
+
+
 
     // Authenticate - optional
     // boolean auth = db.authenticate("foo", "bar");
@@ -90,6 +104,8 @@ public class Serial implements SerialPortEventListener {
 
             // get a collection object to work with
             gpsDataCollection = db.getCollection("gpsDataCollection");
+
+
             // drop all the data in it
         } catch (UnknownHostException e) {
 
@@ -135,6 +151,10 @@ public class Serial implements SerialPortEventListener {
             serialPort.notifyOnDataAvailable(true);
 
             System.out.println("Connected to port: " + connectedportname);
+
+            userData.put("username", "test");
+            userData.put("dateTime", d);
+
         } catch (Exception e) {
             System.err.println(e.toString());
         }
@@ -163,10 +183,35 @@ public class Serial implements SerialPortEventListener {
 
                 //double input_val =  Double.parseDole(inputLine);
                 System.out.println(inputLine);
-                if(count%2==0)
-                gpsDataCollection.insert(new BasicDBObject().append("Coordinates", inputLine));
-                else gpsDataCollection.insert(new BasicDBObject().append("BPM", inputLine));
-                count ++;
+
+                if (inputLine.substring(0, 3).matches("GPS")) {
+
+                    System.out.println("Processing gps...");
+                    String[] parts = inputLine.split(",");
+                    String longitude = parts[0].substring(3);
+                    String lattitude =parts[1].replaceAll("\\s","");
+
+                    if(lattitude.length()<11){
+                        lattitude = '0'+lattitude;
+                    }
+
+                    gpsDataList.add(longitude);
+                    gpsDataList.add(lattitude);
+
+                } else if (inputLine.substring(0, 2).matches("<3")) {
+                    System.out.println("Processing bpm...");
+                    bpmDataList.add(inputLine.substring(2));
+                    count ++;
+                } else if (inputLine.matches("close")) {
+
+                    System.out.println("closing...");
+                    data.append("coordinates", gpsDataList);
+                    data.append("bpm", bpmDataList);
+                    userData.put("data", data);
+                    gpsDataCollection.insert(userData);
+
+                }
+
 
             } catch (Exception e) {
                 System.err.println(e.toString());
